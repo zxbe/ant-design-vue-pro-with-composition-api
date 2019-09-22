@@ -5,11 +5,10 @@ const api = {
   Register: '/auth/register',
   twoStepCode: '/auth/2step-code',
   SendSms: '/account/sms',
-  SendSmsErr: '/account/sms_err',
-  // get my info
-  UserInfo: '/user/info'
+  SendSmsErr: '/account/sms_err'
 }
 
 export * from './service/dashboard'
+export * from './service/user'
 
 export default api

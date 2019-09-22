@@ -18,7 +18,7 @@ export default {
     }
 
     const PageConf = types[type]
-    console.log(PageConf, types)
+
     return () => (
       <div class="exception">
         <div class="imgBlock">
