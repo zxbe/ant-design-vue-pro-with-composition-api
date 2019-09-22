@@ -20,10 +20,18 @@ const RepositoryForm = {
       default: false
     }
   },
-  methods: {
-    handleSubmit(e) {
+  setup: props => {
+    const { getFieldDecorator, validateFields } = props.form
+    const validate = (rule, value, callback) => {
+      const regex = /^user-(.*)$/
+      if (!regex.test(value)) {
+        callback(new Error('需要以 user- 开头'))
+      }
+      callback()
+    }
+    const handleSubmit = e => {
       e.preventDefault()
-      this.form.validateFields((err, values) => {
+      validateFields((err, values) => {
         if (!err) {
           this.$notification['error']({
             message: 'Received values of form:',
@@ -32,18 +40,9 @@ const RepositoryForm = {
         }
       })
     }
-  },
-  setup: props => {
-    const { getFieldDecorator } = props.form
-    const validate = (rule, value, callback) => {
-      const regex = /^user-(.*)$/
-      if (!regex.test(value)) {
-        callback(new Error('需要以 user- 开头'))
-      }
-      callback()
-    }
+
     return () => (
-      <a-form onSubmit={() => this.handleSubmit}>
+      <a-form onSubmit={e => handleSubmit(e)}>
         <a-row class="form-row" gutter={16}>
           <a-col {...wrapperPropsLeft}>
             <a-form-item label="仓库名">
