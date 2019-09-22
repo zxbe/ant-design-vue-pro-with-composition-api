@@ -1,110 +1,10 @@
-<template>
-  <div>
-    <a-card class="card" title="仓库管理" :bordered="false">
-      <repository-form ref="repository" :showSubmit="false" />
-    </a-card>
-    <a-card class="card" title="任务管理" :bordered="false">
-      <task-form ref="task" :showSubmit="false" />
-    </a-card>
-
-    <!-- table -->
-    <a-card>
-      <a-form :form="form">
-        <a-table :columns="columns" :dataSource="data" :pagination="false" :loading="memberLoading">
-          <template
-            v-for="(col, i) in ['name', 'workId', 'department']"
-            :slot="col"
-            slot-scope="text, record"
-          >
-            <template v-if="record.editable">
-              <a-form-item
-                :key="col"
-                :vDecorator="[`${col}`, {rules:[{required: true}], initialValue: text}]"
-              >
-                <a-input
-                  :value="text"
-                  :placeholder="columns[i].title"
-                  @change="e => handleChange(e.target.value, record.key, col)"
-                />
-              </a-form-item>
-            </template>
-
-            <template v-else>{{ text }}</template>
-          </template>
-          <template slot="operation" slot-scope="text, record">
-            <template v-if="record.editable">
-              <span v-if="record.isNew">
-                <a @click="saveRow(record)">添加</a>
-                <a-divider type="vertical" />
-                <a-popconfirm title="是否要删除此行？" @confirm="remove(record.key)">
-                  <a>删除</a>
-                </a-popconfirm>
-              </span>
-              <span v-else>
-                <a @click="saveRow(record)">保存</a>
-                <a-divider type="vertical" />
-                <a @click="cancel(record.key)">取消</a>
-              </span>
-            </template>
-            <span v-else>
-              <a @click="toggle(record.key)">编辑</a>
-              <a-divider type="vertical" />
-              <a-popconfirm title="是否要删除此行？" @confirm="remove(record.key)">
-                <a>删除</a>
-              </a-popconfirm>
-            </span>
-          </template>
-        </a-table>
-      </a-form>
-
-      <a-button
-        style="width: 100%; margin-top: 16px; margin-bottom: 8px"
-        type="dashed"
-        icon="plus"
-        @click="newMember"
-      >新增成员</a-button>
-    </a-card>
-
-    <!-- fixed footer toolbar -->
-    <footer-tool-bar
-      :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}"
-    >
-      <span class="popover-wrapper">
-        <a-popover
-          title="表单校验信息"
-          overlayClassName="antd-pro-pages-forms-style-errorPopover"
-          trigger="click"
-          :getPopupContainer="trigger => trigger.parentNode"
-        >
-          <template slot="content">
-            <li
-              v-for="item in errors"
-              :key="item.key"
-              @click="scrollToField(item.key)"
-              class="antd-pro-pages-forms-style-errorListItem"
-            >
-              <a-icon type="cross-circle-o" class="antd-pro-pages-forms-style-errorIcon" />
-              <div class>{{ item.message }}</div>
-              <div class="antd-pro-pages-forms-style-errorField">{{ item.fieldLabel }}</div>
-            </li>
-          </template>
-          <span class="antd-pro-pages-forms-style-errorIcon" v-if="errors.length > 0">
-            <a-icon type="exclamation-circle" />
-            {{ errors.length }}
-          </span>
-        </a-popover>
-      </span>
-      <a-button type="primary" @click="validate" :loading="loading">提交</a-button>
-    </footer-tool-bar>
-  </div>
-</template>
-
 <script>
+import { ref } from '@vue/composition-api'
 import RepositoryForm from './RepositoryForm'
 import TaskForm from './TaskForm'
 import FooterToolBar from '@/components/FooterToolbar'
 import { mixin, mixinDevice } from '@/utils/mixin'
-
+import useForm from '@/hooks/useForm'
 const fieldLabels = {
   name: '仓库名',
   url: '仓库域名',
@@ -123,9 +23,6 @@ const fieldLabels = {
 export default {
   name: 'AdvancedForm',
   mixins: [mixin, mixinDevice],
-  beforeCreate () {
-    this.form = this.$form.createForm(this)
-  },
   components: {
     FooterToolBar,
     RepositoryForm,
@@ -137,165 +34,63 @@ export default {
       loading: false,
       memberLoading: false,
 
-      // table
-      columns: [
-        {
-          title: '成员姓名',
-          dataIndex: 'name',
-          key: 'name',
-          width: '20%',
-          scopedSlots: { customRender: 'name' }
-        },
-        {
-          title: '工号',
-          dataIndex: 'workId',
-          key: 'workId',
-          width: '20%',
-          scopedSlots: { customRender: 'workId' }
-        },
-        {
-          title: '所属部门',
-          dataIndex: 'department',
-          key: 'department',
-          width: '40%',
-          scopedSlots: { customRender: 'department' }
-        },
-        {
-          title: '操作',
-          key: 'action',
-          scopedSlots: { customRender: 'operation' }
-        }
-      ],
-      data: [
-        {
-          key: '1',
-          name: '小明',
-          workId: '001',
-          editable: false,
-          department: '行政部'
-        },
-        {
-          key: '2',
-          name: '李莉',
-          workId: '002',
-          editable: false,
-          department: 'IT部'
-        },
-        {
-          key: '3',
-          name: '王小帅',
-          workId: '003',
-          editable: false,
-          department: '财务部'
-        }
-      ],
-
       errors: []
     }
   },
-  methods: {
-    handleSubmit (e) {
-      e.preventDefault()
-    },
-    newMember () {
-      const length = this.data.length
-      this.data.push({
-        key: length === 0 ? '1' : (parseInt(this.data[length - 1].key) + 1).toString(),
-        name: '',
-        workId: '',
-        department: '',
-        editable: true,
-        isNew: true
-      })
-    },
-    remove (key) {
-      const newData = this.data.filter(item => item.key !== key)
-      this.data = newData
-    },
-    saveRow (record) {
-      this.memberLoading = true
-      this.form.validateFields((err, values) => {
-        console.log(err, values)
-        if (err) {
-          this.memberLoading = false
+  setup: () => {
+    const repositoryForm = ref(null)
+    const taskForm = ref(null)
+    const { formValidateFields: repositoryFormValidate } = useForm(repositoryForm)
+    const { formValidateFields: taskFormValidate } = useForm(taskForm)
 
-          return
-        }
-        const { key } = record
-        // 模拟网络请求、卡顿 800ms
-        new Promise(resolve => {
-          setTimeout(() => {
-            resolve({ loop: false })
-          }, 800)
-        }).then(() => {
-          const target = this.data.filter(item => item.key === key)[0]
-          target.editable = false
-          target.isNew = false
-          this.memberLoading = false
-        })
-      })
-    },
-    toggle (key) {
-      const target = this.data.filter(item => item.key === key)[0]
-      target.editable = !target.editable
-    },
-    getRowByKey (key, newData) {
-      const data = this.data
-      return (newData || data).filter(item => item.key === key)[0]
-    },
-    cancel (key) {
-      const target = this.data.filter(item => item.key === key)[0]
-      target.editable = false
-    },
-    handleChange (value, key, column) {
-      const newData = [...this.data]
-      const target = newData.filter(item => key === item.key)[0]
-      if (target) {
-        target[column] = value
-        this.data = newData
-      }
-    },
+    // this.errors = []
 
-    // 最终全页面提交
-    validate () {
-      const {
-        $refs: { repository, task },
-        $notification
-      } = this
-      const repositoryForm = new Promise((resolve, reject) => {
-        repository.form.validateFields((err, values) => {
-          if (err) {
-            reject(err)
-            return
-          }
-          resolve(values)
-        })
-      })
-      const taskForm = new Promise((resolve, reject) => {
-        task.form.validateFields((err, values) => {
-          if (err) {
-            reject(err)
-            return
-          }
-          resolve(values)
-        })
-      })
-
-      // clean this.errors
-      this.errors = []
-      Promise.all([repositoryForm, taskForm])
+    const pageSubmit = () => {
+      Promise.all([repositoryFormValidate, taskFormValidate])
         .then(values => {
-          $notification['error']({
-            message: 'Received values of form:',
-            description: JSON.stringify(values)
-          })
+          console.log(values)
+          // $notification['error']({
+          //   message: 'Received values of form:',
+          //   description: JSON.stringify(values)
+          // })
         })
         .catch(() => {
-          const errors = Object.assign({}, repository.form.getFieldsError(), task.form.getFieldsError())
-          const tmp = { ...errors }
-          this.errorList(tmp)
+          // const errors = Object.assign({}, repositoryForm.form.getFieldsError(), taskForm.form.getFieldsError())
+          // const tmp = { ...errors }
+          // this.errorList(tmp)
         })
-    },
+    }
+    return {
+      repositoryForm,
+      taskForm,
+      pageSubmit
+    }
+  },
+  methods: {
+    // 最终全页面提交
+    // validate () {
+    //   const { $notification, respository, task } = this
+    //   const repositoryForm = new Promise((resolve, reject) => {
+    //     respository.form.validateFields((err, values) => {
+    //       if (err) {
+    //         reject(err)
+    //         return
+    //       }
+    //       resolve(values)
+    //     })
+    //   })
+    //   const taskForm = new Promise((resolve, reject) => {
+    //     task.form.validateFields((err, values) => {
+    //       if (err) {
+    //         reject(err)
+    //         return
+    //       }
+    //       resolve(values)
+    //     })
+    //   })
+
+    //   // clean this.errors
+    // },
     errorList (errors) {
       if (!errors || errors.length === 0) {
         return
@@ -314,6 +109,56 @@ export default {
         labelNode.scrollIntoView(true)
       }
     }
+  },
+  render () {
+    const { pageSubmit } = this
+    return (
+      <div>
+        <a-card class="card" title="仓库管理" bordered={false}>
+          <repository-form ref="respository" showSubmit={true} />
+        </a-card>
+        <a-card class="card" title="任务管理" bordered={false}>
+          <task-form ref="task" showSubmit={true} />
+        </a-card>
+        <a-card></a-card>
+
+        <footer-tool-bar
+          style={{
+            width: this.isSideMenu() && this.isDesktop() ? `calc(100% - ${this.sidebarOpened ? 256 : 80}px)` : '100%'
+          }}
+        >
+          <span class="popover-wrapper">
+            <a-popover
+              title="表单校验信息"
+              overlayClassName="antd-pro-pages-forms-style-errorPopover"
+              trigger="click"
+              getPopupContainer={trigger => trigger.parentNode}
+            >
+              <template slot="content">
+                {this.errors.map(item => {
+                  return (
+                    <li onClick={this.scrollToField(item.key)} class="antd-pro-pages-forms-style-errorListItem">
+                      <a-icon type="cross-circle-o" class="antd-pro-pages-forms-style-errorIcon" />
+                      <div class>{item.message}</div>
+                      <div class="antd-pro-pages-forms-style-errorField">{item.fieldLabel}</div>
+                    </li>
+                  )
+                })}
+              </template>
+              {this.errors.length ? (
+                <span class="antd-pro-pages-forms-style-errorIcon">
+                  <a-icon type="exclamation-circle" />
+                  {this.errors.length}
+                </span>
+              ) : null}
+            </a-popover>
+          </span>
+          <a-button type="primary" onClick={e => pageSubmit(e)} loading={this.loading}>
+            提交
+          </a-button>
+        </footer-tool-bar>
+      </div>
+    )
   }
 }
 </script>

@@ -1,5 +1,5 @@
 // import Vue from 'vue'
-import { onMounted } from '@vue/composition-api'
+import { onMounted, computed } from '@vue/composition-api'
 import { deviceEnquire, DEVICE_TYPE } from '@/utils/device'
 import { mapState } from 'vuex'
 
