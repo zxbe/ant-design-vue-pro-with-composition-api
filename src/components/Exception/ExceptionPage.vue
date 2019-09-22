@@ -1,20 +1,6 @@
-<template>
-  <div class="exception">
-    <div class="imgBlock">
-      <div class="imgEle" :style="{backgroundImage: `url(${config[type].img})`}">
-      </div>
-    </div>
-    <div class="content">
-      <h1>{{ config[type].title }}</h1>
-      <div class="desc">{{ config[type].desc }}</div>
-      <div class="actions">
-        <a-button type="primary" @click="handleToHome">返回首页</a-button>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script>
+// eslint-disable-next-line
+import { createElement as h } from '@vue/composition-api'
 import types from './type'
 
 export default {
@@ -25,20 +11,35 @@ export default {
       default: '404'
     }
   },
-  data () {
-    return {
-      config: types
+  setup: (props, { root }) => {
+    const { type } = props
+    const handleToHome = () => {
+      root.$router.push({ name: 'dashboard' })
     }
-  },
-  methods: {
-    handleToHome () {
-      this.$router.push({ name: 'dashboard' })
-    }
+
+    const PageConf = types[type]
+    console.log(PageConf, types)
+    return () => (
+      <div class="exception">
+        <div class="imgBlock">
+          <div class="imgEle" style={{ backgroundImage: `url(${PageConf.img})` }}></div>
+        </div>
+        <div class="content">
+          <h1>{PageConf.title}</h1>
+          <div class="desc">{PageConf.desc}</div>
+          <div class="actions">
+            <a-button type="primary" onClick={handleToHome}>
+              返回首页
+            </a-button>
+          </div>
+        </div>
+      </div>
+    )
   }
 }
 </script>
 <style lang="less">
-@import "~ant-design-vue/lib/style/index";
+@import '~ant-design-vue/lib/style/index';
 
 .exception {
   display: flex;
