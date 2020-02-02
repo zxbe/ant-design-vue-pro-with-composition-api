@@ -72,6 +72,15 @@
       </a-col>
     </a-row>
 
+    <table>
+      <tr>
+        <user>
+          <p>1</p>
+          <p>3</p>
+        </user>
+      </tr>
+    </table>
+
     <a-card :loading="loading" :bordered="false" :body-style="{padding: '0'}">
       <div class="salesCard">
         <a-tabs
@@ -253,7 +262,7 @@ import {
 } from '@/components'
 import { mixinDevice } from '@/utils/mixin'
 import { onMounted, ref, reactive, toRefs } from '@vue/composition-api'
-
+import User from './User'
 import { fetchBarData } from '@/api'
 
 const rankList = []
@@ -364,9 +373,10 @@ export default {
     Bar,
     Trend,
     NumberInfo,
-    MiniSmoothArea
+    MiniSmoothArea,
+    User
   },
-  setup () {
+  setup() {
     const barData = reactive({
       barData: [],
       barData2: []
@@ -390,7 +400,7 @@ export default {
       loading
     }
   },
-  data () {
+  data() {
     return {
       rankList,
 

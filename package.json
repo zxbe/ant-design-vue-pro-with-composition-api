@@ -120,7 +120,8 @@
         {
           "ignoreReadBeforeAssign": false
         }
-      ]
+      ],
+      "space-before-function-paren": 0
     }
   },
   "postcss": {

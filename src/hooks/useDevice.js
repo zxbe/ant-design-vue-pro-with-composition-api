@@ -2,8 +2,6 @@ import { computed } from '@vue/composition-api'
 import { DEVICE_TYPE } from '@/utils/device'
 
 const useDetactDevice = ({ root }) => {
-  console.log(root)
-
   const state = root.$store.state
   const device = computed(() => {
     return state.app.device

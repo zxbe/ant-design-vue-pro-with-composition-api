@@ -153,6 +153,7 @@ export default {
           setTimeout(() => {
             this.confirmLoading = false
             this.$emit('ok', values)
+            this.visible = false
           }, 1500)
         } else {
           this.confirmLoading = false

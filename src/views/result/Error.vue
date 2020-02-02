@@ -24,21 +24,37 @@
         </div>
       </div>
     </result>
+    <!-- <span ref="root"></span> -->
+    <a-button @click="open">open</a-button>
+
+    <o-drawer :visible="visible" @success="handleSuccess" />
   </a-card>
 </template>
 
 <script>
 import { Result } from '@/components'
+import { ref } from '@vue/composition-api'
 
 export default {
   name: 'Error',
   components: {
-    Result
+    Result,
+    ODrawer: () => import('./ODrawer')
   },
   setup: () => {
+    const visible = ref(true)
+    const open = () => (visible.value = true)
+    const handleSuccess = () => {
+      console.log('success')
+      visible.value = false
+    }
+
     return {
       title: '提交失败',
-      description: '请核对并修改以下信息后，再重新提交。'
+      description: '请核对并修改以下信息后，再重新提交。',
+      visible,
+      handleSuccess,
+      open
     }
   }
 }
