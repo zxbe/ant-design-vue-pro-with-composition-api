@@ -7,11 +7,12 @@ if (IS_PROD) {
 
 module.exports = {
   presets: [
+    'vca-jsx',
     '@vue/app',
     [
       '@babel/preset-env',
       {
-        'useBuiltIns': 'entry'
+        useBuiltIns: 'entry'
       }
     ]
   ],

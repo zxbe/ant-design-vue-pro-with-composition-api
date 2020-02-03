@@ -1,6 +1,4 @@
 <script>
-import { Fragment } from 'vue'
-console.log(Fragment)
 export default {
   name: 'User',
   render(h) {

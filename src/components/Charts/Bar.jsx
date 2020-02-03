@@ -1,16 +1,6 @@
-<template>
-  <div :style="{ padding: '0 0 32px 32px' }">
-    <h4 :style="{ marginBottom: '20px' }">{{ title }}</h4>
-    <v-chart height="254" :data="data" :forceFit="true" :padding="['auto', 'auto', '40', '50']">
-      <v-tooltip />
-      <v-axis />
-      <v-bar position="x*y" />
-    </v-chart>
-  </div>
-</template>
+import { createComponent } from '@vue/composition-api'
 
-<script>
-export default {
+export default createComponent({
   name: 'Bar',
   props: {
     title: {
@@ -52,6 +42,20 @@ export default {
         ]
       }
     }
+  },
+  setup: props => {
+    return () => {
+      const { title, data } = props
+      return (
+        <div style={{ padding: '0 0 32px 32px' }}>
+          <h4 style={{ marginBottom: '20px' }}>{title}</h4>
+          <v-chart height="254" data={data} forceFit={true} padding={['auto', 'auto', '40', '50']}>
+            <v-tooltip />
+            <v-axis />
+            <v-bar position="x*y" />
+          </v-chart>
+        </div>
+      )
+    }
   }
-}
-</script>
+})

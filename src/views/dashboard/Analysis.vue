@@ -72,15 +72,6 @@
       </a-col>
     </a-row>
 
-    <table>
-      <tr>
-        <user>
-          <p>1</p>
-          <p>3</p>
-        </user>
-      </tr>
-    </table>
-
     <a-card :loading="loading" :bordered="false" :body-style="{padding: '0'}">
       <div class="salesCard">
         <a-tabs
@@ -397,11 +388,8 @@ export default {
 
     return {
       ...toRefs(barData),
-      loading
-    }
-  },
-  data() {
-    return {
+      loading,
+
       rankList,
 
       // 搜索用户数

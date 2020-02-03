@@ -18,28 +18,30 @@ export default createComponent({
       default: false
     }
   },
-  render() {
-    let { loading, total } = this
-    return (
-      <a-card loading={loading} bordered={false}>
-        <div class="chart-card-header">
-          <div class="meta">
-            <span class="chart-card-title">{this.$slots.title}</span>
-            <span class="chart-card-action">{this.$slots.action}</span>
+  setup: (props, ctx) => {
+    return () => {
+      const { loading, total, title } = props
+      return (
+        <a-card loading={loading} bordered={false}>
+          <div class="chart-card-header">
+            <div class="meta">
+              <span class="chart-card-title">{title}</span>
+              <span class="chart-card-action">{ctx.slots.action()}</span>
+            </div>
+            <div class="total">
+              <slot name="total">
+                <span>{(typeof total === 'function' && total()) || total}</span>
+              </slot>
+            </div>
           </div>
-          <div class="total">
-            <slot name="total">
-              <span>{(typeof total === 'function' && total()) || total}</span>
-            </slot>
+          <div class="chart-card-content">
+            <div class="content-fix">{ctx.slots.default()}</div>
           </div>
-        </div>
-        <div class="chart-card-content">
-          <div class="content-fix">{this.$slots.default}</div>
-        </div>
-        <div class="chart-card-footer">
-          <div class="field">{this.$slots.footer}</div>
-        </div>
-      </a-card>
-    )
+          <div class="chart-card-footer">
+            <div class="field">{ctx.slots.footer()}</div>
+          </div>
+        </a-card>
+      )
+    }
   }
 })
