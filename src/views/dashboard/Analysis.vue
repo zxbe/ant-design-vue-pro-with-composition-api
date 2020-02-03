@@ -388,8 +388,11 @@ export default {
 
     return {
       ...toRefs(barData),
-      loading,
-
+      loading
+    }
+  },
+  data() {
+    return {
       rankList,
 
       // 搜索用户数
