@@ -18,7 +18,7 @@ export default createComponent({
       default: false
     }
   },
-  setup: (props, ctx) => {
+  setup: (props, { slots }) => {
     return () => {
       const { loading, total, title } = props
       return (
@@ -26,7 +26,7 @@ export default createComponent({
           <div class="chart-card-header">
             <div class="meta">
               <span class="chart-card-title">{title}</span>
-              <span class="chart-card-action">{ctx.slots.action()}</span>
+              <span class="chart-card-action">{slots.action && slots.action()}</span>
             </div>
             <div class="total">
               <slot name="total">
@@ -35,10 +35,10 @@ export default createComponent({
             </div>
           </div>
           <div class="chart-card-content">
-            <div class="content-fix">{ctx.slots.default()}</div>
+            <div class="content-fix">{slots.default && slots.default()}</div>
           </div>
           <div class="chart-card-footer">
-            <div class="field">{ctx.slots.footer()}</div>
+            <div class="field">{slots.footer && slots.footer()}</div>
           </div>
         </a-card>
       )
